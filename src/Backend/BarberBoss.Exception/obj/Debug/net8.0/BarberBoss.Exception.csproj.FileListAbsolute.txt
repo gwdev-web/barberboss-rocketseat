@@ -1,0 +1,12 @@
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/bin/Debug/net8.0/BarberBoss.Exception.deps.json
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/bin/Debug/net8.0/BarberBoss.Exception.dll
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/bin/Debug/net8.0/BarberBoss.Exception.pdb
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/obj/Debug/net8.0/BarberBoss.Exception.GeneratedMSBuildEditorConfig.editorconfig
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/obj/Debug/net8.0/BarberBoss.Exception.AssemblyInfoInputs.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/obj/Debug/net8.0/BarberBoss.Exception.AssemblyInfo.cs
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/obj/Debug/net8.0/BarberBoss.Exception.csproj.CoreCompileInputs.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/obj/Debug/net8.0/BarberBoss.Exception.sourcelink.json
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/obj/Debug/net8.0/BarberBoss.Exception.dll
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/obj/Debug/net8.0/refint/BarberBoss.Exception.dll
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/obj/Debug/net8.0/BarberBoss.Exception.pdb
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Exception/obj/Debug/net8.0/ref/BarberBoss.Exception.dll

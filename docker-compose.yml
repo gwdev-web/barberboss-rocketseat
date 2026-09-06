@@ -1,3 +1,16 @@
+# -----------------------------------------------------------------------------
+# Ambiente de DESENVOLVIMENTO.
+#
+#   docker compose up --build
+#
+# Diferenças em relação ao docker-compose.prod.yml:
+#   - ASPNETCORE_ENVIRONMENT=Development (mensagens de erro detalhadas)
+#   - Swagger ligado
+#   - porta do MySQL publicada no host, para conectar com DBeaver/Workbench
+#   - senhas com valor padrão, sem obrigatoriedade
+#   - token com validade longa (120 min), para não expirar no meio dos testes
+# -----------------------------------------------------------------------------
+
 services:
   mysql:
     image: mysql:8.0
@@ -25,16 +38,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: final
     container_name: barberboss-api
     restart: unless-stopped
     depends_on:
       mysql:
         condition: service_healthy
     environment:
+      # A imagem tem ASPNETCORE_ENVIRONMENT=Production embutida; aqui sobrescrevemos.
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
       ConnectionStrings__Connection: "Server=mysql;Port=3306;Database=${MYSQL_DATABASE:-barberboss};Uid=${MYSQL_USER:-barberboss};Pwd=${MYSQL_PASSWORD:-barberboss};"
       Settings__Jwt__SigningKey: ${JWT_SIGNING_KEY:?defina JWT_SIGNING_KEY no arquivo .env}
       Settings__Jwt__ExpirationTimeMinutes: ${JWT_EXPIRATION_MINUTES:-120}
+      Settings__Swagger__Enabled: "true"
+      # URL que a API imprime no log ao subir — a que você abre no navegador.
+      Settings__PublicUrl: "http://localhost:${API_PORT:-8080}"
     ports:
       - "${API_PORT:-8080}:8080"
     networks:

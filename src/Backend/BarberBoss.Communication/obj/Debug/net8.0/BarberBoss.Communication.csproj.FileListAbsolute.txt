@@ -1,0 +1,12 @@
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/bin/Debug/net8.0/BarberBoss.Communication.deps.json
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/bin/Debug/net8.0/BarberBoss.Communication.dll
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/bin/Debug/net8.0/BarberBoss.Communication.pdb
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/obj/Debug/net8.0/BarberBoss.Communication.GeneratedMSBuildEditorConfig.editorconfig
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/obj/Debug/net8.0/BarberBoss.Communication.AssemblyInfoInputs.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/obj/Debug/net8.0/BarberBoss.Communication.AssemblyInfo.cs
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/obj/Debug/net8.0/BarberBoss.Communication.csproj.CoreCompileInputs.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/obj/Debug/net8.0/BarberBoss.Communication.sourcelink.json
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/obj/Debug/net8.0/BarberBoss.Communication.dll
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/obj/Debug/net8.0/refint/BarberBoss.Communication.dll
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/obj/Debug/net8.0/BarberBoss.Communication.pdb
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Communication/obj/Debug/net8.0/ref/BarberBoss.Communication.dll

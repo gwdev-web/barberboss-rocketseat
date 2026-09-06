@@ -59,7 +59,7 @@ RUN chown -R app:app /app
 USER app
 
 ENV ASPNETCORE_ENVIRONMENT=Production \
-    ASPNETCORE_URLS=http://+:8080 \
+    ASPNETCORE_URLS=http://0.0.0.0:8080 \
     DOTNET_RUNNING_IN_CONTAINER=true \
     DOTNET_gcServer=1
 

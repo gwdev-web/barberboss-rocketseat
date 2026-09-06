@@ -31,7 +31,10 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Configuration.GetValue("Settings:Swagger:Enabled", defaultValue: true))
+// Em produção o Swagger vem desligado; uma App Setting religa sem novo deploy.
+var swaggerEnabled = app.Configuration.GetValue("Settings:Swagger:Enabled", defaultValue: true);
+
+if (swaggerEnabled)
 {
     app.UseSwagger();
     app.UseSwaggerUI(options =>
@@ -50,6 +53,30 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapApiHealthChecks();
+
+// O Kestrel escuta em todas as interfaces do container e o log dele mostra o endereço
+// de bind (0.0.0.0), que não serve para abrir no navegador. O aviso abaixo imprime a
+// URL que você usa de fato no host, montada pelo docker compose a partir de API_PORT.
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    var publicUrl = app.Configuration["Settings:PublicUrl"];
+
+    if (string.IsNullOrWhiteSpace(publicUrl))
+        return;
+
+    publicUrl = publicUrl.TrimEnd('/');
+
+    var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("BarberBoss");
+
+    logger.LogInformation("BarberBoss API pronta em {PublicUrl}", publicUrl);
+    logger.LogInformation("Ambiente: {Environment}", app.Environment.EnvironmentName);
+    logger.LogInformation("Health check em {HealthUrl}", $"{publicUrl}/health/ready");
+
+    if (swaggerEnabled)
+        logger.LogInformation("Swagger em {SwaggerUrl}", $"{publicUrl}/swagger");
+    else
+        logger.LogInformation("Swagger desligado neste ambiente (Settings:Swagger:Enabled).");
+});
 
 await app.Services.MigrateDatabase();
 

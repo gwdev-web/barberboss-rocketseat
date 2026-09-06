@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "V4WDRXNKWsA=",
+  "success": true,
+  "projectFilePath": "/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/BarberBoss.Domain.csproj",
+  "expectedPackageFiles": [
+    "/home/galaxy2/.nuget/packages/microsoft.netcore.app.ref/8.0.30/microsoft.netcore.app.ref.8.0.30.nupkg.sha512",
+    "/home/galaxy2/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.30/microsoft.aspnetcore.app.ref.8.0.30.nupkg.sha512"
+  ],
+  "logs": []
+}

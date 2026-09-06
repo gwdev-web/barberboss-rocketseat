@@ -1,0 +1,8 @@
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/UseCases.Tests/bin/Debug/net8.0/.msCoverageSourceRootsMapping_UseCases.Tests
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/UseCases.Tests/bin/Debug/net8.0/CoverletSourceRootsMapping_UseCases.Tests
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/UseCases.Tests/obj/Debug/net8.0/UseCases.Tests.csproj.AssemblyReference.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/UseCases.Tests/obj/Debug/net8.0/UseCases.Tests.GeneratedMSBuildEditorConfig.editorconfig
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/UseCases.Tests/obj/Debug/net8.0/UseCases.Tests.AssemblyInfoInputs.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/UseCases.Tests/obj/Debug/net8.0/UseCases.Tests.AssemblyInfo.cs
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/UseCases.Tests/obj/Debug/net8.0/UseCases.Tests.csproj.CoreCompileInputs.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/UseCases.Tests/obj/Debug/net8.0/UseCases.Tests.sourcelink.json

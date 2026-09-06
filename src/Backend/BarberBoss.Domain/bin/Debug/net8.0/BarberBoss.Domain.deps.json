@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "BarberBoss.Domain/1.0.0": {
+        "dependencies": {
+          "BarberBoss.Communication": "1.0.0"
+        },
+        "runtime": {
+          "BarberBoss.Domain.dll": {}
+        }
+      },
+      "BarberBoss.Communication/1.0.0": {
+        "runtime": {
+          "BarberBoss.Communication.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "BarberBoss.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BarberBoss.Communication/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

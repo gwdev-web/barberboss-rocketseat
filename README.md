@@ -23,19 +23,50 @@ endurecida, configuração por variável de ambiente, health checks e um pipelin
 
 ## Como rodar
 
-Local, como antes:
+Desenvolvimento:
 
 ```bash
-cp .env.example .env   # ajuste JWT_SIGNING_KEY
 docker compose up --build
 ```
 
-Simulando produção na sua máquina:
+A API imprime no log a URL que você abre no navegador:
+
+```
+info: BarberBoss[0] BarberBoss API pronta em http://localhost:8080
+info: BarberBoss[0] Ambiente: Development
+info: BarberBoss[0] Health check em http://localhost:8080/health/ready
+info: BarberBoss[0] Swagger em http://localhost:8080/swagger
+```
+
+O Kestrel também loga `http://0.0.0.0:8080`: esse é o endereço de *bind*, interno ao
+container. Quem vale para você é o `localhost` na porta de `API_PORT`.
+
+Simulando produção na mesma máquina:
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
 curl http://localhost:8080/health/ready
 ```
+
+### Dev x Prod
+
+Os dois compose usam o mesmo `Dockerfile` e o mesmo estágio `final`. O que muda é a
+configuração injetada:
+
+| | `docker-compose.yml` | `docker-compose.prod.yml` |
+| --- | --- | --- |
+| `ASPNETCORE_ENVIRONMENT` | `Development` | `Production` |
+| Swagger | ligado | desligado (religável por App Setting) |
+| Nível de log | `Information` | `Warning`, exceto a categoria `BarberBoss` |
+| Porta do MySQL | publicada no host | só na rede interna do compose |
+| Senhas | têm valor padrão | obrigatórias; o compose falha sem elas |
+| Validade do token | 120 min | 60 min |
+| Healthcheck do serviço | — | `/health/ready` a cada 30s |
+| `restart` | `unless-stopped` | `always` |
+
+A imagem já nasce com `ASPNETCORE_ENVIRONMENT=Production` embutida e o compose de
+desenvolvimento sobrescreve. Assim, qualquer host que rode a imagem sem configuração
+explícita cai em produção, que é o padrão mais seguro dos dois.
 
 Rodando a suíte dentro do container, do mesmo jeito que o pipeline faz:
 

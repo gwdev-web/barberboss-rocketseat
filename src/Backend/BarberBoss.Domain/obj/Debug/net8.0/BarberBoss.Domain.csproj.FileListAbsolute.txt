@@ -1,0 +1,16 @@
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/bin/Debug/net8.0/BarberBoss.Domain.deps.json
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/bin/Debug/net8.0/BarberBoss.Domain.dll
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/bin/Debug/net8.0/BarberBoss.Domain.pdb
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/bin/Debug/net8.0/BarberBoss.Communication.dll
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/bin/Debug/net8.0/BarberBoss.Communication.pdb
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/BarberBoss.Domain.csproj.AssemblyReference.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/BarberBoss.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/BarberBoss.Domain.AssemblyInfoInputs.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/BarberBoss.Domain.AssemblyInfo.cs
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/BarberBoss.Domain.csproj.CoreCompileInputs.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/BarberBoss.Domain.sourcelink.json
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/BarberBo.1914ED4E.Up2Date
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/BarberBoss.Domain.dll
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/refint/BarberBoss.Domain.dll
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/BarberBoss.Domain.pdb
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/src/Backend/BarberBoss.Domain/obj/Debug/net8.0/ref/BarberBoss.Domain.dll

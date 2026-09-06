@@ -1,0 +1,8 @@
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/Validators.Tests/bin/Debug/net8.0/.msCoverageSourceRootsMapping_Validators.Tests
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/Validators.Tests/bin/Debug/net8.0/CoverletSourceRootsMapping_Validators.Tests
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/Validators.Tests/obj/Debug/net8.0/Validators.Tests.csproj.AssemblyReference.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/Validators.Tests/obj/Debug/net8.0/Validators.Tests.GeneratedMSBuildEditorConfig.editorconfig
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/Validators.Tests/obj/Debug/net8.0/Validators.Tests.AssemblyInfoInputs.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/Validators.Tests/obj/Debug/net8.0/Validators.Tests.AssemblyInfo.cs
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/Validators.Tests/obj/Debug/net8.0/Validators.Tests.csproj.CoreCompileInputs.cache
+/home/galaxy2/Documentos/Github/barberboss-rocketseat/tests/Validators.Tests/obj/Debug/net8.0/Validators.Tests.sourcelink.json
