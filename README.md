@@ -29,12 +29,26 @@ inteira em memória.
 ## Como rodar
 
 ```bash
-cp .env.example .env
-# edite JWT_SIGNING_KEY (mínimo 32 caracteres) — o compose falha de propósito se estiver vazia
 docker compose up --build
 ```
 
+O `.env` já vem no projeto, com uma `JWT_SIGNING_KEY` gerada. Se quiser trocá-la
+(`openssl rand -base64 48`), lembre que isso invalida os tokens já emitidos. O compose
+falha de propósito se a variável estiver vazia.
+
 Swagger em <http://localhost:8080/swagger>.
+
+Ao subir, a API imprime no log a URL do host:
+
+```
+info: BarberBoss[0] BarberBoss API pronta em http://localhost:8080
+info: BarberBoss[0] Swagger em http://localhost:8080/swagger
+```
+
+O Kestrel também loga o endereço de *bind* (`http://0.0.0.0:8080`): é o endereço interno do
+container, onde ele escuta todas as interfaces. Quem você abre no navegador é `localhost` na
+porta de `API_PORT` — trocando `API_PORT` no `.env`, a linha do log acompanha.
+
 
 Para rodar só o banco no Docker:
 

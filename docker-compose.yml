@@ -32,6 +32,8 @@ services:
         condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      # URL que a API imprime no log ao subir — a que você abre no navegador.
+      Settings__PublicUrl: "http://localhost:${API_PORT:-8080}"
       ConnectionStrings__Connection: "Server=mysql;Port=3306;Database=${MYSQL_DATABASE:-barberboss};Uid=${MYSQL_USER:-barberboss};Pwd=${MYSQL_PASSWORD:-barberboss};"
       Settings__Jwt__SigningKey: ${JWT_SIGNING_KEY:?defina JWT_SIGNING_KEY no arquivo .env}
       Settings__Jwt__ExpirationTimeMinutes: ${JWT_EXPIRATION_MINUTES:-120}
