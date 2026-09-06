@@ -1,0 +1,96 @@
+# Mesmo fluxo do GitHub Actions, para quem usa Azure DevOps.
+# Variáveis a criar no pipeline: azureSubscription, webAppName.
+
+trigger:
+  branches:
+    include: [main]
+
+pr:
+  branches:
+    include: [main]
+
+variables:
+  buildConfiguration: Release
+  dotnetVersion: "8.0.x"
+  solution: BarberBoss.sln
+  apiProject: src/Backend/BarberBoss.Api/BarberBoss.Api.csproj
+
+stages:
+  - stage: Build
+    displayName: Build
+    jobs:
+      - job: Build
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: UseDotNet@2
+            inputs:
+              packageType: sdk
+              version: $(dotnetVersion)
+
+          - script: dotnet restore $(solution)
+            displayName: Restore
+
+          - script: dotnet build $(solution) -c $(buildConfiguration) --no-restore
+            displayName: Build
+
+  - stage: Test
+    displayName: Test
+    dependsOn: Build
+    jobs:
+      - job: Test
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: UseDotNet@2
+            inputs:
+              packageType: sdk
+              version: $(dotnetVersion)
+
+          - script: dotnet restore $(solution)
+            displayName: Restore
+
+          - script: >
+              dotnet test $(solution)
+              -c $(buildConfiguration)
+              --no-restore
+              --logger trx
+              --collect:"XPlat Code Coverage"
+              --results-directory $(Agent.TempDirectory)/TestResults
+            displayName: Testes
+
+          - task: PublishTestResults@2
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: VSTest
+              testResultsFiles: "**/*.trx"
+              searchFolder: $(Agent.TempDirectory)/TestResults
+
+  - stage: Deploy
+    displayName: Deploy
+    dependsOn: Test
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: DeployApi
+        environment: production
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: UseDotNet@2
+                  inputs:
+                    packageType: sdk
+                    version: $(dotnetVersion)
+
+                - script: dotnet publish $(apiProject) -c $(buildConfiguration) -o $(Build.ArtifactStagingDirectory)/publish
+                  displayName: Publish
+
+                - task: AzureWebApp@1
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    appName: $(webAppName)
+                    package: $(Build.ArtifactStagingDirectory)/publish

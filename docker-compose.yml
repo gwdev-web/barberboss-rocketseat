@@ -1,0 +1,48 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: barberboss-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-barberboss}
+      MYSQL_USER: ${MYSQL_USER:-barberboss}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-barberboss}
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - barberboss-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - barberboss
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: barberboss-api
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__Connection: "Server=mysql;Port=3306;Database=${MYSQL_DATABASE:-barberboss};Uid=${MYSQL_USER:-barberboss};Pwd=${MYSQL_PASSWORD:-barberboss};"
+      Settings__Jwt__SigningKey: ${JWT_SIGNING_KEY:?defina JWT_SIGNING_KEY no arquivo .env}
+      Settings__Jwt__ExpirationTimeMinutes: ${JWT_EXPIRATION_MINUTES:-120}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    networks:
+      - barberboss
+
+volumes:
+  barberboss-mysql-data:
+
+networks:
+  barberboss:
+    driver: bridge
