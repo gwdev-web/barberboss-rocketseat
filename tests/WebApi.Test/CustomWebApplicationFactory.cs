@@ -44,7 +44,6 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 ["Settings:Jwt:ExpirationTimeMinutes"] = "60",
                 ["Settings:Jwt:Issuer"] = "BarberBoss",
                 ["Settings:Jwt:Audience"] = "BarberBossClient",
-                ["Settings:Swagger:Enabled"] = "false",
             });
         });
 

@@ -1,130 +1,130 @@
-# BarberBoss API — Parte III
+# BarberBoss API — Parte II
 
-Fecha a trilha: pega a API da [Parte II](../barberboss-pt2) e a deixa pronta para produção.
-Nenhuma regra de negócio mudou — o que muda é tudo o que cerca a aplicação: imagem Docker
-endurecida, configuração por variável de ambiente, health checks e um pipeline
-**Build → Test → Deploy** com Continuous Deploy.
+Continuação da [Parte I](../barberboss-pt1). A API de faturamento agora tem **gestão de
+usuários e autenticação**: cadastro, perfil, edição, exclusão, senha criptografada com
+**BCrypt** e login que devolve um **token JWT**.
+
+Todas as rotas de faturamento passaram a exigir autenticação e cada usuário enxerga
+**apenas o próprio faturamento**.
+
+Inclui **testes de unidade** das regras de negócio e **testes de integração** que sobem a API
+inteira em memória.
 
 ---
 
-## O que mudou em relação à Parte II
+## O que mudou em relação à Parte I
 
 | Área | Mudança |
 | --- | --- |
-| Dockerfile | Estágios separados (restore/build/test/publish/runtime), usuário não-root, `HEALTHCHECK`, cache de restore |
-| Health checks | `/health` (liveness) e `/health/ready` (checa o MySQL) |
-| Configuração | `appsettings.Production.json`; segredos só por variável de ambiente |
-| Swagger | Desligado por padrão em produção, com chave para religar |
-| Compose | `docker-compose.prod.yml` com senhas obrigatórias e banco sem porta exposta |
-| CI/CD | `ci-cd.yml`, `docker-image.yml` e `azure-pipelines.yml` |
-| Docs | [`docs/deploy.md`](docs/deploy.md) com o passo a passo do Azure |
+| Entidades | Nova entidade `User`; `Billing` ganhou `UserId` com FK e cascade |
+| Segurança | `PasswordEncripter` (BCrypt, work factor 12) e `JwtTokenGenerator` |
+| Autorização | `[Authorize]` em faturamentos e relatórios; só o dono (ou admin) edita/exclui usuário |
+| Repositórios | Consultas de faturamento escopadas por `userId` |
+| Swagger | Botão **Authorize** com esquema Bearer |
+| Testes | Novo projeto `WebApi.Test` com `WebApplicationFactory` + EF InMemory |
+| Erros | Novos `401 Unauthorized` e `403 Forbidden` |
 
 ---
 
 ## Como rodar
 
-Local, como antes:
-
 ```bash
-cp .env.example .env   # ajuste JWT_SIGNING_KEY
+cp .env.example .env
+# edite JWT_SIGNING_KEY (mínimo 32 caracteres) — o compose falha de propósito se estiver vazia
 docker compose up --build
 ```
 
-Simulando produção na sua máquina:
+Swagger em <http://localhost:8080/swagger>.
+
+Para rodar só o banco no Docker:
 
 ```bash
-docker compose -f docker-compose.prod.yml up -d --build
-curl http://localhost:8080/health/ready
+docker compose up -d mysql
+dotnet run --project src/Backend/BarberBoss.Api
 ```
 
-Rodando a suíte dentro do container, do mesmo jeito que o pipeline faz:
+Testes (unidade + integração):
 
 ```bash
-docker build --target test .
+dotnet test
 ```
 
 ---
 
-## Health checks
+## Fluxo de autenticação
 
-| Rota | Verifica | Quem consome |
-| --- | --- | --- |
-| `GET /health` | Se o processo responde | `HEALTHCHECK` do Docker |
-| `GET /health/ready` | Também a conexão com o MySQL | App Service, balanceador, smoke test do deploy |
+1. `POST /api/users` cria a conta e já devolve um token.
+2. `POST /api/login` troca e-mail + senha por um token.
+3. As demais rotas exigem `Authorization: Bearer <token>`.
 
-```json
-{
-  "status": "Healthy",
-  "totalDurationMs": 12.4,
-  "checks": [
-    { "name": "database", "status": "Healthy", "durationMs": 11.8, "description": null }
-  ]
-}
+```bash
+# 1. cadastro
+curl -X POST http://localhost:8080/api/users \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Rafael Souza","email":"rafael@barberboss.com","password":"barberboss123"}'
+
+# 2. login
+TOKEN=$(curl -s -X POST http://localhost:8080/api/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"rafael@barberboss.com","password":"barberboss123"}' | jq -r .token)
+
+# 3. rota protegida
+curl http://localhost:8080/api/billings -H "Authorization: Bearer $TOKEN"
 ```
 
-Ambas são públicas, sem token.
+No Swagger, clique em **Authorize** e cole apenas o token (sem o prefixo `Bearer`).
 
 ---
 
-## Pipeline
+## Endpoints de usuário
 
-```
-push / PR ──> build ──> test ─┬─> (PR para aqui)
-                              │
-              push na main ───┴─> publish ──> deploy ──> smoke test
-```
+| Método | Rota | Auth | Descrição |
+| --- | --- | --- | --- |
+| POST | `/api/login` | — | Autentica e devolve o token |
+| POST | `/api/users` | — | Cria um usuário (`201`) |
+| GET | `/api/users` | ✔ | Perfil do usuário autenticado |
+| GET | `/api/users/{id}` | ✔ | Dados de um usuário (próprio ou admin) |
+| PUT | `/api/users` | ✔ | Atualiza o próprio perfil (`204`) |
+| PUT | `/api/users/{id}` | ✔ | Atualiza um usuário (próprio ou admin) |
+| PUT | `/api/users/password` | ✔ | Troca a senha do usuário autenticado |
+| DELETE | `/api/users/{id}` | ✔ | Exclui um usuário (próprio ou admin) |
 
-`.github/workflows/ci-cd.yml`:
-
-* **build** — restore com cache de NuGet e compilação em Release.
-* **test** — unidade e integração juntos; resultados e cobertura viram artefato.
-  Os testes de integração usam o EF InMemory, então o runner não precisa de MySQL.
-* **publish** — `dotnet publish` e upload do artefato.
-* **deploy** — só em push na `main`, via `azure/webapps-deploy`, no *environment*
-  `production` (onde dá para exigir aprovação manual).
-* **smoke test** — consulta `/health/ready` por até 2,5 minutos após o deploy.
-
-`.github/workflows/docker-image.yml` é o caminho alternativo: roda o estágio `test` do
-Dockerfile e, passando, publica a imagem no GitHub Container Registry.
-
-`azure-pipelines.yml` reproduz o mesmo fluxo em Azure DevOps.
-
-### Segredos do repositório
-
-| Segredo | Onde é usado |
-| --- | --- |
-| `AZURE_WEBAPP_PUBLISH_PROFILE` | Job de deploy |
-| `CONNECTION_STRING` | App Settings do App Service |
-| `JWT_SIGNING_KEY` | App Settings do App Service |
+Os endpoints de faturamento e relatórios continuam iguais aos da Parte I, mas agora todos
+exigem token.
 
 ---
 
-## Configuração em produção
+## Regras de segurança
 
-Nada sensível fica versionado. O `appsettings.Production.json` guarda só o que é público
-(nível de log, issuer, audience, expiração); o resto chega por variável de ambiente:
-
-```
-ASPNETCORE_ENVIRONMENT=Production
-ConnectionStrings__Connection=Server=...;Database=barberboss;Uid=...;Pwd=...;SslMode=Required;
-Settings__Jwt__SigningKey=<openssl rand -base64 48>
-```
-
-O duplo underscore mapeia para as seções aninhadas do `appsettings.json`.
-
-O passo a passo completo — criar os recursos no Azure, configurar o health check, ligar o
-pipeline e lidar com migrations em múltiplas instâncias — está em
-[`docs/deploy.md`](docs/deploy.md).
+* Senha nunca é armazenada nem devolvida em texto puro: só o hash BCrypt fica no banco.
+* Cada usuário tem um salt próprio, então senhas iguais geram hashes diferentes.
+* E-mail é único: índice único no banco e checagem no caso de uso, devolvendo `409`.
+* E-mail inexistente e senha errada devolvem a **mesma** mensagem, para não revelar quais
+  e-mails estão cadastrados.
+* Faturamento de outro usuário devolve `404`, não `403`: a API não confirma que o recurso existe.
+* O token carrega `sid` (id), nome, e-mail e role, e expira em 120 minutos por padrão.
+* `Settings:Jwt:SigningKey` precisa ter no mínimo 32 caracteres — a aplicação recusa subir sem isso.
 
 ---
 
-## Endurecimento da imagem
+## Testes
 
-* Multi-stage: o SDK, o código-fonte e os pacotes NuGet ficam nos estágios de build; a
-  imagem final tem só o runtime e os binários publicados.
-* Roda como `app` (UID 1654), o usuário sem privilégios das imagens oficiais do .NET 8.
-* Os `.csproj` são copiados antes do resto do código, então o `dotnet restore` só refaz
-  quando alguma dependência muda.
-* `HEALTHCHECK` embutido apontando para `/health`.
-* `.dockerignore` mais amplo, para o contexto de build não carregar `bin`, `obj`, `.git`,
-  `.env` nem os workflows.
+```
+tests
+├── CommonTestUtilities   → builders (Bogus), mocks (Moq), mapper, encripter e token
+├── Validators.Tests      → regras de faturamento e de usuário
+├── UseCases.Tests        → casos de uso, hash de senha, autorização
+└── WebApi.Test           → integração ponta a ponta com WebApplicationFactory
+```
+
+Os testes de integração trocam o MySQL pelo provider **InMemory** do EF Core, mantendo
+o restante do pipeline (filtros, autenticação, casos de uso) idêntico ao de produção.
+Eles cobrem: cadastro, login com senha correta e incorreta, acesso a rota protegida sem
+token, e isolamento entre usuários.
+
+---
+
+## Próxima parte
+
+**Parte III** — Dockerfile de produção, `appsettings.Production.json`, health check e
+pipeline Build → Test → Deploy com Continuous Deploy.
