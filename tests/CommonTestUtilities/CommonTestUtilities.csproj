@@ -16,7 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Backend\BarberBoss.Application\BarberBoss.Application.csproj" />
     <ProjectReference Include="..\..\src\Backend\BarberBoss.Domain\BarberBoss.Domain.csproj" />
-    <ProjectReference Include="..\..\src\Backend\BarberBoss.Infrastructure\BarberBoss.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

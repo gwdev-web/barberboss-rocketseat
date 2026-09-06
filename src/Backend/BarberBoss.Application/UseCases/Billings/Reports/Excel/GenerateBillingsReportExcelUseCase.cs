@@ -3,7 +3,6 @@ using BarberBoss.Domain.Entities;
 using BarberBoss.Domain.Extensions;
 using BarberBoss.Domain.Reports;
 using BarberBoss.Domain.Repositories.Billings;
-using BarberBoss.Domain.Services.LoggedUser;
 using ClosedXML.Excel;
 
 namespace BarberBoss.Application.UseCases.Billings.Reports.Excel;
@@ -16,21 +15,14 @@ public class GenerateBillingsReportExcelUseCase : IGenerateBillingsReportExcelUs
     private const string GOLD = "#F5B301";
 
     private readonly IBillingsReadOnlyRepository _repository;
-    private readonly ILoggedUser _loggedUser;
 
-    public GenerateBillingsReportExcelUseCase(IBillingsReadOnlyRepository repository, ILoggedUser loggedUser)
-    {
-        _repository = repository;
-        _loggedUser = loggedUser;
-    }
+    public GenerateBillingsReportExcelUseCase(IBillingsReadOnlyRepository repository) => _repository = repository;
 
     public async Task<ReportFile> Execute(DateOnly? referenceDate)
     {
         var (start, end) = ReportPeriod.Resolve(referenceDate);
 
-        var loggedUser = await _loggedUser.Get();
-
-        var billings = await _repository.FilterByPeriod(loggedUser.Id, start, end);
+        var billings = await _repository.FilterByPeriod(start, end);
 
         var fileName = ReportFileNames.Excel(start, end);
 

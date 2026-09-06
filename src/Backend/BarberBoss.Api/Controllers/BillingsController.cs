@@ -6,15 +6,12 @@ using BarberBoss.Application.UseCases.Billings.Summary;
 using BarberBoss.Application.UseCases.Billings.Update;
 using BarberBoss.Communication.Requests;
 using BarberBoss.Communication.Responses;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BarberBoss.Api.Controllers;
 
 [Route("api/billings")]
 [ApiController]
-[Authorize]
-[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
 [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status500InternalServerError)]
 public class BillingsController : ControllerBase

@@ -18,20 +18,10 @@ public class AutoMapping : Profile
     {
         CreateMap<RequestBillingJson, Billing>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.UserId, opt => opt.Ignore())
-            .ForMember(dest => dest.User, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
 
         CreateMap<RequestBillingFilterJson, FilterBillingsDto>();
-
-        CreateMap<RequestRegisterUserJson, User>()
-            .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
-            .ForMember(dest => dest.Role, opt => opt.Ignore())
-            .ForMember(dest => dest.Billings, opt => opt.Ignore())
-            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
     }
 
     private void DomainToResponse()
@@ -39,9 +29,5 @@ public class AutoMapping : Profile
         CreateMap<Billing, ResponseBillingJson>();
         CreateMap<Billing, ResponseShortBillingJson>();
         CreateMap<Billing, ResponseRegisteredBillingJson>();
-
-        CreateMap<User, ResponseUserJson>();
-        CreateMap<User, ResponseRegisteredUserJson>()
-            .ForMember(dest => dest.Token, opt => opt.Ignore());
     }
 }

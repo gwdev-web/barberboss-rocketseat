@@ -4,7 +4,6 @@ using BarberBoss.Domain.Entities;
 using BarberBoss.Domain.Extensions;
 using BarberBoss.Domain.Reports;
 using BarberBoss.Domain.Repositories.Billings;
-using BarberBoss.Domain.Services.LoggedUser;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -16,21 +15,14 @@ public class GenerateBillingsReportPdfUseCase : IGenerateBillingsReportPdfUseCas
     private static readonly CultureInfo Culture = new("pt-BR");
 
     private readonly IBillingsReadOnlyRepository _repository;
-    private readonly ILoggedUser _loggedUser;
 
-    public GenerateBillingsReportPdfUseCase(IBillingsReadOnlyRepository repository, ILoggedUser loggedUser)
-    {
-        _repository = repository;
-        _loggedUser = loggedUser;
-    }
+    public GenerateBillingsReportPdfUseCase(IBillingsReadOnlyRepository repository) => _repository = repository;
 
     public async Task<ReportFile> Execute(DateOnly? referenceDate)
     {
         var (start, end) = ReportPeriod.Resolve(referenceDate);
 
-        var loggedUser = await _loggedUser.Get();
-
-        var billings = await _repository.FilterByPeriod(loggedUser.Id, start, end);
+        var billings = await _repository.FilterByPeriod(start, end);
 
         var fileName = ReportFileNames.Pdf(start, end);
 

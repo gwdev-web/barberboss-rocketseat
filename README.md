@@ -1,49 +1,80 @@
-# BarberBoss API — Parte II
+# BarberBoss API — Parte I
 
-Continuação da [Parte I](../barberboss-pt1). A API de faturamento agora tem **gestão de
-usuários e autenticação**: cadastro, perfil, edição, exclusão, senha criptografada com
-**BCrypt** e login que devolve um **token JWT**.
+API REST em **.NET 8** para gerenciar o faturamento de uma barbearia: CRUD de faturamentos,
+total do período, relatórios semanais em **PDF** e **Excel**, tratamento global de erros,
+testes de unidade e documentação no **Swagger**.
 
-Todas as rotas de faturamento passaram a exigir autenticação e cada usuário enxerga
-**apenas o próprio faturamento**.
+Persistência em **MySQL**, que sobe junto com a API via **Docker Compose**.
 
-Inclui **testes de unidade** das regras de negócio e **testes de integração** que sobem a API
-inteira em memória.
+A arquitetura segue a linha do projeto [CashFlow](https://github.com/welissonArley/CashFlow):
+camadas separadas por responsabilidade e um caso de uso por operação.
 
 ---
 
-## O que mudou em relação à Parte I
+## Stack
 
-| Área | Mudança |
+| Camada | Tecnologia |
 | --- | --- |
-| Entidades | Nova entidade `User`; `Billing` ganhou `UserId` com FK e cascade |
-| Segurança | `PasswordEncripter` (BCrypt, work factor 12) e `JwtTokenGenerator` |
-| Autorização | `[Authorize]` em faturamentos e relatórios; só o dono (ou admin) edita/exclui usuário |
-| Repositórios | Consultas de faturamento escopadas por `userId` |
-| Swagger | Botão **Authorize** com esquema Bearer |
-| Testes | Novo projeto `WebApi.Test` com `WebApplicationFactory` + EF InMemory |
-| Erros | Novos `401 Unauthorized` e `403 Forbidden` |
+| Runtime | .NET 8 |
+| Web | ASP.NET Core + Swashbuckle (Swagger) |
+| ORM | Entity Framework Core 8 + Pomelo MySQL |
+| Banco | MySQL 8 (container) |
+| Mapeamento | AutoMapper |
+| Validação | FluentValidation |
+| PDF | QuestPDF |
+| Excel | ClosedXML |
+| Testes | xUnit + FluentAssertions + Moq + Bogus |
+
+---
+
+## Estrutura
+
+```
+BarberBoss.sln
+├── src/Backend
+│   ├── BarberBoss.Api              → Controllers, filtro de exceção, Swagger, Program
+│   ├── BarberBoss.Application      → Casos de uso, validators, AutoMapper, relatórios
+│   ├── BarberBoss.Communication    → Requests, Responses e enums (contrato público)
+│   ├── BarberBoss.Domain           → Entidades, DTOs e interfaces de repositório
+│   ├── BarberBoss.Exception        → Exceções de domínio e mensagens
+│   └── BarberBoss.Infrastructure   → DbContext, repositórios, migrations, DI
+└── tests
+    ├── CommonTestUtilities         → Builders (Bogus), mocks (Moq), mapper
+    ├── Validators.Tests            → Testes das regras de validação
+    └── UseCases.Tests              → Testes dos casos de uso
+```
+
+Direção das dependências: `Api → Application → Domain`. A `Infrastructure` implementa as
+interfaces do `Domain` e só é conhecida pela `Api` no momento da injeção de dependência.
 
 ---
 
 ## Como rodar
 
+### Opção 1 — tudo no Docker (recomendado)
+
 ```bash
 cp .env.example .env
-# edite JWT_SIGNING_KEY (mínimo 32 caracteres) — o compose falha de propósito se estiver vazia
 docker compose up --build
 ```
 
-Swagger em <http://localhost:8080/swagger>.
+* API: <http://localhost:8080/swagger>
+* MySQL: `localhost:3306`
 
-Para rodar só o banco no Docker:
+As migrations são aplicadas automaticamente no start da API, com retry enquanto o container
+do MySQL termina de subir.
+
+### Opção 2 — só o banco no Docker, API na máquina
 
 ```bash
 docker compose up -d mysql
 dotnet run --project src/Backend/BarberBoss.Api
 ```
 
-Testes (unidade + integração):
+A connection string de desenvolvimento já aponta para `localhost:3306` em
+`appsettings.Development.json`.
+
+### Rodando os testes
 
 ```bash
 dotnet test
@@ -51,80 +82,119 @@ dotnet test
 
 ---
 
-## Fluxo de autenticação
+## Endpoints
 
-1. `POST /api/users` cria a conta e já devolve um token.
-2. `POST /api/login` troca e-mail + senha por um token.
-3. As demais rotas exigem `Authorization: Bearer <token>`.
+Base: `/api`
+
+| Método | Rota | Descrição | Sucesso |
+| --- | --- | --- | --- |
+| POST | `/api/billings` | Cria um faturamento | `201 Created` |
+| GET | `/api/billings` | Lista com filtros, paginação e ordenação | `200 OK` |
+| GET | `/api/billings/summary` | Total do período (apenas pagos) | `200 OK` |
+| GET | `/api/billings/{id}` | Busca por id | `200 OK` |
+| PUT | `/api/billings/{id}` | Atualiza | `204 No Content` |
+| DELETE | `/api/billings/{id}` | Exclui | `204 No Content` |
+| GET | `/api/reports/pdf` | Relatório semanal em PDF | `200 OK` / `204` |
+| GET | `/api/reports/excel` | Relatório semanal em Excel | `200 OK` / `204` |
+
+### Filtros de `GET /api/billings`
+
+`startDate`, `endDate`, `barberName`, `clientName`, `serviceName`, `paymentMethod`, `status`,
+`pageNumber` (padrão 1), `pageSize` (padrão 20, máx. 100), `sortBy`
+(`Date`, `Amount`, `BarberName`, `ClientName`, `CreatedAt`) e `sortDirection` (`Asc`, `Desc`).
+
+### Relatórios
+
+`referenceDate` aceita qualquer data dentro da semana desejada; a API resolve o intervalo de
+segunda a domingo. Sem o parâmetro, usa a semana corrente. Semana sem lançamentos devolve
+`204 No Content` em vez de um arquivo vazio.
+
+---
+
+## Exemplos
+
+Criar:
 
 ```bash
-# 1. cadastro
-curl -X POST http://localhost:8080/api/users \
+curl -X POST http://localhost:8080/api/billings \
   -H "Content-Type: application/json" \
-  -d '{"name":"Rafael Souza","email":"rafael@barberboss.com","password":"barberboss123"}'
-
-# 2. login
-TOKEN=$(curl -s -X POST http://localhost:8080/api/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"rafael@barberboss.com","password":"barberboss123"}' | jq -r .token)
-
-# 3. rota protegida
-curl http://localhost:8080/api/billings -H "Authorization: Bearer $TOKEN"
+  -d '{
+    "date": "2025-03-04",
+    "barberName": "Rafael Souza",
+    "clientName": "João Pedro",
+    "serviceName": "Corte + Barba",
+    "amount": 75.00,
+    "paymentMethod": 2,
+    "status": 0,
+    "notes": "Cliente da fidelidade"
+  }'
 ```
 
-No Swagger, clique em **Authorize** e cole apenas o token (sem o prefixo `Bearer`).
+Total da semana:
 
----
+```bash
+curl "http://localhost:8080/api/billings/summary?startDate=2025-03-03&endDate=2025-03-09"
+```
 
-## Endpoints de usuário
+Baixar o PDF:
 
-| Método | Rota | Auth | Descrição |
+```bash
+curl -OJ "http://localhost:8080/api/reports/pdf?referenceDate=2025-03-04"
+```
+
+### Enums
+
+| `paymentMethod` | | `status` | |
 | --- | --- | --- | --- |
-| POST | `/api/login` | — | Autentica e devolve o token |
-| POST | `/api/users` | — | Cria um usuário (`201`) |
-| GET | `/api/users` | ✔ | Perfil do usuário autenticado |
-| GET | `/api/users/{id}` | ✔ | Dados de um usuário (próprio ou admin) |
-| PUT | `/api/users` | ✔ | Atualiza o próprio perfil (`204`) |
-| PUT | `/api/users/{id}` | ✔ | Atualiza um usuário (próprio ou admin) |
-| PUT | `/api/users/password` | ✔ | Troca a senha do usuário autenticado |
-| DELETE | `/api/users/{id}` | ✔ | Exclui um usuário (próprio ou admin) |
-
-Os endpoints de faturamento e relatórios continuam iguais aos da Parte I, mas agora todos
-exigem token.
+| `0` | Cartão | `0` | Pago |
+| `1` | Dinheiro | `1` | Cancelado |
+| `2` | Pix | | |
+| `3` | Outro | | |
 
 ---
 
-## Regras de segurança
+## Regras de negócio
 
-* Senha nunca é armazenada nem devolvida em texto puro: só o hash BCrypt fica no banco.
-* Cada usuário tem um salt próprio, então senhas iguais geram hashes diferentes.
-* E-mail é único: índice único no banco e checagem no caso de uso, devolvendo `409`.
-* E-mail inexistente e senha errada devolvem a **mesma** mensagem, para não revelar quais
-  e-mails estão cadastrados.
-* Faturamento de outro usuário devolve `404`, não `403`: a API não confirma que o recurso existe.
-* O token carrega `sid` (id), nome, e-mail e role, e expira em 120 minutos por padrão.
-* `Settings:Jwt:SigningKey` precisa ter no mínimo 32 caracteres — a aplicação recusa subir sem isso.
+* Data, barbeiro, cliente, serviço, valor, forma de pagamento e status são obrigatórios.
+* `barberName` 2–80 caracteres; `clientName` e `serviceName` 2–120; `notes` até 500.
+* `amount` deve ser maior ou igual a zero.
+* Faturamento com status **Cancelado** precisa ter `amount = 0`.
+* A data não pode estar no futuro.
+* **Cancelados não entram no total do período** nem no ticket médio.
 
 ---
 
-## Testes
+## Erros
 
-```
-tests
-├── CommonTestUtilities   → builders (Bogus), mocks (Moq), mapper, encripter e token
-├── Validators.Tests      → regras de faturamento e de usuário
-├── UseCases.Tests        → casos de uso, hash de senha, autorização
-└── WebApi.Test           → integração ponta a ponta com WebApplicationFactory
+Toda resposta de erro sai no mesmo formato, montado pelo `ExceptionFilter`:
+
+```json
+{ "errors": ["O nome do barbeiro é obrigatório."] }
 ```
 
-Os testes de integração trocam o MySQL pelo provider **InMemory** do EF Core, mantendo
-o restante do pipeline (filtros, autenticação, casos de uso) idêntico ao de produção.
-Eles cobrem: cadastro, login com senha correta e incorreta, acesso a rota protegida sem
-token, e isolamento entre usuários.
+| Status | Situação |
+| --- | --- |
+| `400` | Validação de campos ou período inválido |
+| `404` | Faturamento inexistente |
+| `409` | Conflito de dados |
+| `500` | Erro inesperado (detalhes só no log) |
 
 ---
 
-## Próxima parte
+## Migrations
 
-**Parte III** — Dockerfile de produção, `appsettings.Production.json`, health check e
-pipeline Build → Test → Deploy com Continuous Deploy.
+O projeto já vem com a migration inicial e a aplica sozinho no start. Para criar novas:
+
+```bash
+dotnet ef migrations add NomeDaMigration \
+  --project src/Backend/BarberBoss.Infrastructure \
+  --startup-project src/Backend/BarberBoss.Api \
+  --output-dir DataAccess/Migrations
+```
+
+---
+
+## Próximas partes
+
+* **Parte II** — usuários, senha criptografada, login com JWT e testes de integração.
+* **Parte III** — Dockerfile de produção, health check e pipeline Build → Test → Deploy.

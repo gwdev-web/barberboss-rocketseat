@@ -2,7 +2,6 @@ using BarberBoss.Application.UseCases.Billings.Reports.Excel;
 using BarberBoss.Application.UseCases.Billings.Reports.Pdf;
 using BarberBoss.Communication.Enums;
 using CommonTestUtilities.Entities;
-using CommonTestUtilities.LoggedUser;
 using CommonTestUtilities.Repositories;
 using FluentAssertions;
 using QuestPDF.Infrastructure;
@@ -23,7 +22,7 @@ public class GenerateBillingsReportUseCasesTests
         };
 
         var repository = new BillingsReadOnlyRepositoryBuilder().FilterByPeriod(billings).Build();
-        var useCase = new GenerateBillingsReportPdfUseCase(repository, LoggedUserBuilder.Build(UserBuilder.Build()));
+        var useCase = new GenerateBillingsReportPdfUseCase(repository);
 
         var report = await useCase.Execute(new DateOnly(2025, 3, 5));
 
@@ -36,7 +35,7 @@ public class GenerateBillingsReportUseCasesTests
     public async Task Pdf_Returns_Empty_When_There_Is_No_Billing()
     {
         var repository = new BillingsReadOnlyRepositoryBuilder().FilterByPeriod([]).Build();
-        var useCase = new GenerateBillingsReportPdfUseCase(repository, LoggedUserBuilder.Build(UserBuilder.Build()));
+        var useCase = new GenerateBillingsReportPdfUseCase(repository);
 
         var report = await useCase.Execute(referenceDate: null);
 
@@ -49,7 +48,7 @@ public class GenerateBillingsReportUseCasesTests
         var billings = BillingBuilder.Collection(4);
 
         var repository = new BillingsReadOnlyRepositoryBuilder().FilterByPeriod(billings).Build();
-        var useCase = new GenerateBillingsReportExcelUseCase(repository, LoggedUserBuilder.Build(UserBuilder.Build()));
+        var useCase = new GenerateBillingsReportExcelUseCase(repository);
 
         var report = await useCase.Execute(new DateOnly(2025, 3, 5));
 
@@ -62,7 +61,7 @@ public class GenerateBillingsReportUseCasesTests
     public async Task Excel_Returns_Empty_When_There_Is_No_Billing()
     {
         var repository = new BillingsReadOnlyRepositoryBuilder().FilterByPeriod([]).Build();
-        var useCase = new GenerateBillingsReportExcelUseCase(repository, LoggedUserBuilder.Build(UserBuilder.Build()));
+        var useCase = new GenerateBillingsReportExcelUseCase(repository);
 
         var report = await useCase.Execute(referenceDate: null);
 

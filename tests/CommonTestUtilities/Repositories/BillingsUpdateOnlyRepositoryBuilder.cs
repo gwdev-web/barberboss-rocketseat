@@ -11,7 +11,7 @@ public class BillingsUpdateOnlyRepositoryBuilder
     public BillingsUpdateOnlyRepositoryBuilder GetById(Billing? billing)
     {
         _repository
-            .Setup(repository => repository.GetById(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .Setup(repository => repository.GetById(It.IsAny<Guid>()))
             .ReturnsAsync(billing);
 
         return this;

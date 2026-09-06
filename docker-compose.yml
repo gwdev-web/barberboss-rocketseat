@@ -33,8 +33,6 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
       ConnectionStrings__Connection: "Server=mysql;Port=3306;Database=${MYSQL_DATABASE:-barberboss};Uid=${MYSQL_USER:-barberboss};Pwd=${MYSQL_PASSWORD:-barberboss};"
-      Settings__Jwt__SigningKey: ${JWT_SIGNING_KEY:?defina JWT_SIGNING_KEY no arquivo .env}
-      Settings__Jwt__ExpirationTimeMinutes: ${JWT_EXPIRATION_MINUTES:-120}
     ports:
       - "${API_PORT:-8080}:8080"
     networks:

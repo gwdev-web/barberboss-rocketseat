@@ -1,8 +1,6 @@
 using BarberBoss.Application.UseCases.Billings.Delete;
 using BarberBoss.Exception;
 using BarberBoss.Exception.ExceptionsBase;
-using CommonTestUtilities.Entities;
-using CommonTestUtilities.LoggedUser;
 using CommonTestUtilities.Repositories;
 using FluentAssertions;
 
@@ -13,13 +11,9 @@ public class DeleteBillingUseCaseTests
     [Fact]
     public async Task Success()
     {
-        var user = UserBuilder.Build();
         var id = Guid.NewGuid();
-
-        var useCase = new DeleteBillingUseCase(
-            new BillingsWriteOnlyRepositoryBuilder().Delete(user.Id, id, result: true).Build(),
-            LoggedUserBuilder.Build(user),
-            UnitOfWorkBuilder.Build());
+        var repository = new BillingsWriteOnlyRepositoryBuilder().Delete(id, result: true).Build();
+        var useCase = new DeleteBillingUseCase(repository, UnitOfWorkBuilder.Build());
 
         var act = async () => await useCase.Execute(id);
 
@@ -29,13 +23,9 @@ public class DeleteBillingUseCaseTests
     [Fact]
     public async Task Error_Billing_Not_Found()
     {
-        var user = UserBuilder.Build();
         var id = Guid.NewGuid();
-
-        var useCase = new DeleteBillingUseCase(
-            new BillingsWriteOnlyRepositoryBuilder().Delete(user.Id, id, result: false).Build(),
-            LoggedUserBuilder.Build(user),
-            UnitOfWorkBuilder.Build());
+        var repository = new BillingsWriteOnlyRepositoryBuilder().Delete(id, result: false).Build();
+        var useCase = new DeleteBillingUseCase(repository, UnitOfWorkBuilder.Build());
 
         var act = async () => await useCase.Execute(id);
 

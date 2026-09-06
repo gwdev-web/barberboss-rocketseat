@@ -3,7 +3,6 @@ using System;
 using BarberBoss.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -63,9 +62,6 @@ namespace BarberBoss.Infrastructure.DataAccess.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("Date")
@@ -74,65 +70,7 @@ namespace BarberBoss.Infrastructure.DataAccess.Migrations
                     b.HasIndex("Status")
                         .HasDatabaseName("IX_Billings_Status");
 
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("IX_Billings_UserId");
-
                     b.ToTable("Billings");
-                });
-
-            modelBuilder.Entity("BarberBoss.Domain.Entities.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(180)
-                        .HasColumnType("varchar(180)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Users_Email");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("BarberBoss.Domain.Entities.Billing", b =>
-                {
-                    b.HasOne("BarberBoss.Domain.Entities.User", "User")
-                        .WithMany("Billings")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BarberBoss.Domain.Entities.User", b =>
-                {
-                    b.Navigation("Billings");
                 });
 #pragma warning restore 612, 618
         }

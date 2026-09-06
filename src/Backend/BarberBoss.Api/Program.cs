@@ -1,8 +1,9 @@
-using BarberBoss.Api.Extensions;
+using System.Reflection;
 using BarberBoss.Api.Filters;
 using BarberBoss.Application;
 using BarberBoss.Infrastructure;
 using BarberBoss.Infrastructure.Extensions;
+using Microsoft.OpenApi.Models;
 using QuestPDF.Infrastructure;
 
 // Licença Community do QuestPDF (gratuita para uso open source / empresas pequenas).
@@ -17,8 +18,22 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options 
     options.InvalidModelStateResponseFactory = InvalidModelStateResponse.Build;
 });
 
-builder.Services.AddSwagger();
-builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "BarberBoss API",
+        Version = "v1",
+        Description = "API de faturamento de barbearia - Desafio prático BarberBoss pt I (Rocketseat).",
+    });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    if (File.Exists(xmlPath))
+        options.IncludeXmlComments(xmlPath);
+});
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -36,13 +51,9 @@ app.UseSwaggerUI(options =>
 if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
     app.UseHttpsRedirection();
 
-app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
 await app.Services.MigrateDatabase();
 
 app.Run();
-
-/// <summary>Exposto para o WebApplicationFactory dos testes de integração.</summary>
-public partial class Program { }

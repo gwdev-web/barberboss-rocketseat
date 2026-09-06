@@ -15,9 +15,4 @@ public class Billing
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
-    /// <summary>Dono do registro. Cada usuário só enxerga o próprio faturamento.</summary>
-    public Guid UserId { get; set; }
-
-    public User? User { get; set; }
 }

@@ -17,10 +17,9 @@ public class BillingsRepository :
 
     public async Task Add(Billing billing) => await _dbContext.Billings.AddAsync(billing);
 
-    public async Task<bool> Delete(Guid userId, Guid id)
+    public async Task<bool> Delete(Guid id)
     {
-        var billing = await _dbContext.Billings
-            .FirstOrDefaultAsync(entity => entity.Id == id && entity.UserId == userId);
+        var billing = await _dbContext.Billings.FirstOrDefaultAsync(entity => entity.Id == id);
 
         if (billing is null)
             return false;
@@ -30,11 +29,9 @@ public class BillingsRepository :
         return true;
     }
 
-    public async Task<PagedResultDto<Billing>> GetAll(Guid userId, FilterBillingsDto filter)
+    public async Task<PagedResultDto<Billing>> GetAll(FilterBillingsDto filter)
     {
-        var query = _dbContext.Billings
-            .AsNoTracking()
-            .Where(billing => billing.UserId == userId);
+        var query = _dbContext.Billings.AsNoTracking().AsQueryable();
 
         query = ApplyFilters(query, filter);
 
@@ -50,36 +47,29 @@ public class BillingsRepository :
         return new PagedResultDto<Billing> { Items = items, TotalItems = totalItems };
     }
 
-    async Task<Billing?> IBillingsReadOnlyRepository.GetById(Guid userId, Guid id)
-        => await _dbContext.Billings
-            .AsNoTracking()
-            .FirstOrDefaultAsync(billing => billing.Id == id && billing.UserId == userId);
+    async Task<Billing?> IBillingsReadOnlyRepository.GetById(Guid id)
+        => await _dbContext.Billings.AsNoTracking().FirstOrDefaultAsync(billing => billing.Id == id);
 
-    async Task<Billing?> IBillingsUpdateOnlyRepository.GetById(Guid userId, Guid id)
-        => await _dbContext.Billings
-            .FirstOrDefaultAsync(billing => billing.Id == id && billing.UserId == userId);
+    async Task<Billing?> IBillingsUpdateOnlyRepository.GetById(Guid id)
+        => await _dbContext.Billings.FirstOrDefaultAsync(billing => billing.Id == id);
 
     public void Update(Billing billing) => _dbContext.Billings.Update(billing);
 
-    public async Task<IList<Billing>> FilterByPeriod(Guid userId, DateOnly startDate, DateOnly endDate)
+    public async Task<IList<Billing>> FilterByPeriod(DateOnly startDate, DateOnly endDate)
     {
         return await _dbContext.Billings
             .AsNoTracking()
-            .Where(billing => billing.UserId == userId
-                && billing.Date >= startDate
-                && billing.Date <= endDate)
+            .Where(billing => billing.Date >= startDate && billing.Date <= endDate)
             .OrderBy(billing => billing.Date)
             .ThenBy(billing => billing.CreatedAt)
             .ToListAsync();
     }
 
-    public async Task<BillingsSummaryDto> GetSummary(Guid userId, DateOnly startDate, DateOnly endDate)
+    public async Task<BillingsSummaryDto> GetSummary(DateOnly startDate, DateOnly endDate)
     {
         var query = _dbContext.Billings
             .AsNoTracking()
-            .Where(billing => billing.UserId == userId
-                && billing.Date >= startDate
-                && billing.Date <= endDate);
+            .Where(billing => billing.Date >= startDate && billing.Date <= endDate);
 
         // Regra do desafio: apenas faturamentos pagos entram no total.
         var total = await query

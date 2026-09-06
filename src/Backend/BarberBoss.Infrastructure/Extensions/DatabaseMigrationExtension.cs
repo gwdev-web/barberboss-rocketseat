@@ -15,10 +15,6 @@ public static class DatabaseMigrationExtension
         using var scope = serviceProvider.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BarberBossDbContext>();
 
-        // Os testes de integração usam o provider InMemory, que não tem migrations.
-        if (dbContext.Database.IsRelational() == false)
-            return;
-
         for (var attempt = 1; attempt <= attempts; attempt++)
         {
             try

@@ -12,7 +12,7 @@ public class BillingsReadOnlyRepositoryBuilder
     public BillingsReadOnlyRepositoryBuilder GetAll(IList<Billing> billings)
     {
         _repository
-            .Setup(repository => repository.GetAll(It.IsAny<Guid>(), It.IsAny<FilterBillingsDto>()))
+            .Setup(repository => repository.GetAll(It.IsAny<FilterBillingsDto>()))
             .ReturnsAsync(new PagedResultDto<Billing> { Items = billings, TotalItems = billings.Count });
 
         return this;
@@ -21,7 +21,7 @@ public class BillingsReadOnlyRepositoryBuilder
     public BillingsReadOnlyRepositoryBuilder GetById(Billing? billing)
     {
         _repository
-            .Setup(repository => repository.GetById(It.IsAny<Guid>(), It.IsAny<Guid>()))
+            .Setup(repository => repository.GetById(It.IsAny<Guid>()))
             .ReturnsAsync(billing);
 
         return this;
@@ -30,7 +30,7 @@ public class BillingsReadOnlyRepositoryBuilder
     public BillingsReadOnlyRepositoryBuilder GetSummary(BillingsSummaryDto summary)
     {
         _repository
-            .Setup(repository => repository.GetSummary(It.IsAny<Guid>(), It.IsAny<DateOnly>(), It.IsAny<DateOnly>()))
+            .Setup(repository => repository.GetSummary(It.IsAny<DateOnly>(), It.IsAny<DateOnly>()))
             .ReturnsAsync(summary);
 
         return this;
@@ -39,8 +39,7 @@ public class BillingsReadOnlyRepositoryBuilder
     public BillingsReadOnlyRepositoryBuilder FilterByPeriod(IList<Billing> billings)
     {
         _repository
-            .Setup(repository =>
-                repository.FilterByPeriod(It.IsAny<Guid>(), It.IsAny<DateOnly>(), It.IsAny<DateOnly>()))
+            .Setup(repository => repository.FilterByPeriod(It.IsAny<DateOnly>(), It.IsAny<DateOnly>()))
             .ReturnsAsync(billings);
 
         return this;

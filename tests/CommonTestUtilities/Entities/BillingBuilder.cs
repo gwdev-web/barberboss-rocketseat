@@ -6,14 +6,10 @@ namespace CommonTestUtilities.Entities;
 
 public static class BillingBuilder
 {
-    public static Billing Build(
-        BillingStatus status = BillingStatus.Paid,
-        DateOnly? date = null,
-        Guid? userId = null)
+    public static Billing Build(BillingStatus status = BillingStatus.Paid, DateOnly? date = null)
     {
         return new Faker<Billing>("pt_BR")
             .RuleFor(billing => billing.Id, _ => Guid.NewGuid())
-            .RuleFor(billing => billing.UserId, _ => userId ?? Guid.NewGuid())
             .RuleFor(billing => billing.Date, faker => date ?? DateOnly.FromDateTime(faker.Date.Recent(20)))
             .RuleFor(billing => billing.BarberName, faker => faker.Name.FullName())
             .RuleFor(billing => billing.ClientName, faker => faker.Name.FullName())
@@ -28,6 +24,6 @@ public static class BillingBuilder
             .Generate();
     }
 
-    public static IList<Billing> Collection(int count = 5, Guid? userId = null)
-        => Enumerable.Range(0, count).Select(_ => Build(userId: userId)).ToList();
+    public static IList<Billing> Collection(int count = 5)
+        => Enumerable.Range(0, count).Select(_ => Build()).ToList();
 }

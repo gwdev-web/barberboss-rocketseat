@@ -1,14 +1,11 @@
 using BarberBoss.Application.UseCases.Billings.Reports.Excel;
 using BarberBoss.Application.UseCases.Billings.Reports.Pdf;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BarberBoss.Api.Controllers;
 
 [Route("api/reports")]
 [ApiController]
-[Authorize]
-[ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public class ReportsController : ControllerBase
 {
     /// <summary>Relatório semanal de faturamento em PDF.</summary>

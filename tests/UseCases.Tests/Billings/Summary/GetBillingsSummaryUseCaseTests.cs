@@ -2,8 +2,6 @@ using BarberBoss.Application.UseCases.Billings.Summary;
 using BarberBoss.Domain.Dtos;
 using BarberBoss.Exception;
 using BarberBoss.Exception.ExceptionsBase;
-using CommonTestUtilities.Entities;
-using CommonTestUtilities.LoggedUser;
 using CommonTestUtilities.Repositories;
 using FluentAssertions;
 
@@ -17,7 +15,7 @@ public class GetBillingsSummaryUseCaseTests
         var summary = new BillingsSummaryDto { Total = 450m, PaidCount = 6, CancelledCount = 2 };
 
         var repository = new BillingsReadOnlyRepositoryBuilder().GetSummary(summary).Build();
-        var useCase = new GetBillingsSummaryUseCase(repository, LoggedUserBuilder.Build(UserBuilder.Build()));
+        var useCase = new GetBillingsSummaryUseCase(repository);
 
         var result = await useCase.Execute(new DateOnly(2025, 3, 3), new DateOnly(2025, 3, 9));
 
@@ -33,7 +31,7 @@ public class GetBillingsSummaryUseCaseTests
         var summary = new BillingsSummaryDto { Total = 0m, PaidCount = 0, CancelledCount = 3 };
 
         var repository = new BillingsReadOnlyRepositoryBuilder().GetSummary(summary).Build();
-        var useCase = new GetBillingsSummaryUseCase(repository, LoggedUserBuilder.Build(UserBuilder.Build()));
+        var useCase = new GetBillingsSummaryUseCase(repository);
 
         var result = await useCase.Execute(null, null);
 
@@ -47,7 +45,7 @@ public class GetBillingsSummaryUseCaseTests
         var summary = new BillingsSummaryDto { Total = 100m, PaidCount = 1, CancelledCount = 0 };
 
         var repository = new BillingsReadOnlyRepositoryBuilder().GetSummary(summary).Build();
-        var useCase = new GetBillingsSummaryUseCase(repository, LoggedUserBuilder.Build(UserBuilder.Build()));
+        var useCase = new GetBillingsSummaryUseCase(repository);
 
         var result = await useCase.Execute(null, null);
 
@@ -61,7 +59,7 @@ public class GetBillingsSummaryUseCaseTests
     {
         var summary = new BillingsSummaryDto();
         var repository = new BillingsReadOnlyRepositoryBuilder().GetSummary(summary).Build();
-        var useCase = new GetBillingsSummaryUseCase(repository, LoggedUserBuilder.Build(UserBuilder.Build()));
+        var useCase = new GetBillingsSummaryUseCase(repository);
 
         var act = async () => await useCase.Execute(new DateOnly(2025, 3, 10), new DateOnly(2025, 3, 1));
 

@@ -3,7 +3,6 @@ using BarberBoss.Communication.Requests;
 using BarberBoss.Communication.Responses;
 using BarberBoss.Domain.Dtos;
 using BarberBoss.Domain.Repositories.Billings;
-using BarberBoss.Domain.Services.LoggedUser;
 using BarberBoss.Exception.ExceptionsBase;
 
 namespace BarberBoss.Application.UseCases.Billings.GetAll;
@@ -11,16 +10,11 @@ namespace BarberBoss.Application.UseCases.Billings.GetAll;
 public class GetAllBillingsUseCase : IGetAllBillingsUseCase
 {
     private readonly IBillingsReadOnlyRepository _repository;
-    private readonly ILoggedUser _loggedUser;
     private readonly IMapper _mapper;
 
-    public GetAllBillingsUseCase(
-        IBillingsReadOnlyRepository repository,
-        ILoggedUser loggedUser,
-        IMapper mapper)
+    public GetAllBillingsUseCase(IBillingsReadOnlyRepository repository, IMapper mapper)
     {
         _repository = repository;
-        _loggedUser = loggedUser;
         _mapper = mapper;
     }
 
@@ -28,10 +22,8 @@ public class GetAllBillingsUseCase : IGetAllBillingsUseCase
     {
         Validate(request);
 
-        var loggedUser = await _loggedUser.Get();
-
         var filter = _mapper.Map<FilterBillingsDto>(request);
-        var result = await _repository.GetAll(loggedUser.Id, filter);
+        var result = await _repository.GetAll(filter);
 
         var totalPages = filter.PageSize == 0
             ? 0

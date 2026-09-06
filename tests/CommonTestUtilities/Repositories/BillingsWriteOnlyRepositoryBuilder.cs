@@ -7,9 +7,9 @@ public class BillingsWriteOnlyRepositoryBuilder
 {
     private readonly Mock<IBillingsWriteOnlyRepository> _repository = new();
 
-    public BillingsWriteOnlyRepositoryBuilder Delete(Guid userId, Guid id, bool result)
+    public BillingsWriteOnlyRepositoryBuilder Delete(Guid id, bool result)
     {
-        _repository.Setup(repository => repository.Delete(userId, id)).ReturnsAsync(result);
+        _repository.Setup(repository => repository.Delete(id)).ReturnsAsync(result);
 
         return this;
     }

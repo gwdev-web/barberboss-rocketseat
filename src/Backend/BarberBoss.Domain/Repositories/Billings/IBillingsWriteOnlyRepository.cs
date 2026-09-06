@@ -6,6 +6,6 @@ public interface IBillingsWriteOnlyRepository
 {
     Task Add(Billing billing);
 
-    /// <returns><c>true</c> quando o faturamento existia, pertencia ao usuário e foi removido.</returns>
-    Task<bool> Delete(Guid userId, Guid id);
+    /// <returns><c>true</c> quando o faturamento existia e foi removido.</returns>
+    Task<bool> Delete(Guid id);
 }

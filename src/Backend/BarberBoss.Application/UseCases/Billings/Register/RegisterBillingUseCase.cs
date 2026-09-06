@@ -4,7 +4,6 @@ using BarberBoss.Communication.Responses;
 using BarberBoss.Domain.Entities;
 using BarberBoss.Domain.Repositories;
 using BarberBoss.Domain.Repositories.Billings;
-using BarberBoss.Domain.Services.LoggedUser;
 using BarberBoss.Exception.ExceptionsBase;
 
 namespace BarberBoss.Application.UseCases.Billings.Register;
@@ -12,18 +11,15 @@ namespace BarberBoss.Application.UseCases.Billings.Register;
 public class RegisterBillingUseCase : IRegisterBillingUseCase
 {
     private readonly IBillingsWriteOnlyRepository _repository;
-    private readonly ILoggedUser _loggedUser;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
     public RegisterBillingUseCase(
         IBillingsWriteOnlyRepository repository,
-        ILoggedUser loggedUser,
         IUnitOfWork unitOfWork,
         IMapper mapper)
     {
         _repository = repository;
-        _loggedUser = loggedUser;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
@@ -32,11 +28,8 @@ public class RegisterBillingUseCase : IRegisterBillingUseCase
     {
         Validate(request);
 
-        var loggedUser = await _loggedUser.Get();
-
         var billing = _mapper.Map<Billing>(request);
         billing.Id = Guid.NewGuid();
-        billing.UserId = loggedUser.Id;
         billing.CreatedAt = DateTime.UtcNow;
         billing.UpdatedAt = DateTime.UtcNow;
 

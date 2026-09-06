@@ -34,17 +34,4 @@ public static class ResourceMessagesException
     public const string PAGE_SIZE_INVALID = "O tamanho da página deve estar entre 1 e 100.";
 
     public const string NO_BILLINGS_FOR_THE_PERIOD = "Não há faturamentos registrados no período informado.";
-
-    // ----- Usuários e autenticação (parte II) -----
-    public const string USER_NOT_FOUND = "Usuário não encontrado.";
-    public const string NAME_REQUIRED = "O nome é obrigatório.";
-    public const string NAME_LENGTH = "O nome deve ter entre 2 e 100 caracteres.";
-    public const string EMAIL_REQUIRED = "O e-mail é obrigatório.";
-    public const string EMAIL_INVALID = "O e-mail informado não é válido.";
-    public const string EMAIL_ALREADY_REGISTERED = "Já existe um usuário cadastrado com esse e-mail.";
-    public const string PASSWORD_REQUIRED = "A senha é obrigatória.";
-    public const string PASSWORD_MIN_LENGTH = "A senha deve ter no mínimo 6 caracteres.";
-    public const string EMAIL_OR_PASSWORD_INVALID = "E-mail ou senha inválidos.";
-    public const string CURRENT_PASSWORD_INVALID = "A senha atual está incorreta.";
-    public const string NO_PERMISSION = "Você não tem permissão para acessar esse recurso.";
 }
