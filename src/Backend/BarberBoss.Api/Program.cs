@@ -54,6 +54,24 @@ if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") != "true")
 app.UseAuthorization();
 app.MapControllers();
 
+// O Kestrel escuta em todas as interfaces do container e o log dele mostra o endereço
+// de bind (0.0.0.0), que não serve para abrir no navegador. O aviso abaixo imprime a
+// URL que você usa de fato no host, montada pelo docker compose a partir de API_PORT.
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    var publicUrl = app.Configuration["Settings:PublicUrl"];
+
+    if (string.IsNullOrWhiteSpace(publicUrl))
+        return;
+
+    publicUrl = publicUrl.TrimEnd('/');
+
+    var logger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("BarberBoss");
+
+    logger.LogInformation("BarberBoss API pronta em {PublicUrl}", publicUrl);
+    logger.LogInformation("Swagger em {SwaggerUrl}", $"{publicUrl}/swagger");
+});
+
 await app.Services.MigrateDatabase();
 
 app.Run();

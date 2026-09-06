@@ -54,12 +54,22 @@ interfaces do `Domain` e só é conhecida pela `Api` no momento da injeção de 
 ### Opção 1 — tudo no Docker (recomendado)
 
 ```bash
-cp .env.example .env
 docker compose up --build
 ```
 
 * API: <http://localhost:8080/swagger>
 * MySQL: `localhost:3306`
+
+Ao subir, a API imprime no log a URL do host:
+
+```
+info: BarberBoss[0] BarberBoss API pronta em http://localhost:8080
+info: BarberBoss[0] Swagger em http://localhost:8080/swagger
+```
+
+O Kestrel também loga o endereço de *bind* (`http://0.0.0.0:8080`): é o endereço interno do
+container, onde ele escuta todas as interfaces. Quem você abre no navegador é `localhost` na
+porta de `API_PORT` — trocando `API_PORT` no `.env`, a linha do log acompanha.
 
 As migrations são aplicadas automaticamente no start da API, com retry enquanto o container
 do MySQL termina de subir.
